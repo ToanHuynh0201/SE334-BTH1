@@ -18,6 +18,7 @@
     <color name="md_primary_light">#FFE0C3FF</color>
     <color name="md_primary_dark">#FF7C3AED</color>
     <color name="md_secondary">#FF80DEEA</color>
+    <color name="md_secondary_container">#FF21464C</color>
     <color name="md_tertiary">#FFCE93D8</color>
 
     <!-- Functional Colors -->
@@ -27,15 +28,16 @@
     <color name="info_blue">#FF60A5FA</color>
 
     <!-- Surface & Background (Dark Mode) -->
-    <color name="surface_light">#FF121212</color>
-    <color name="surface_variant">#FF1E1E1E</color>
-    <color name="outline">#FF424242</color>
-    <color name="outline_variant">#FF616161</color>
+    <color name="surface_light">#FF0F1116</color>
+    <color name="surface_variant">#FF171A22</color>
+    <color name="outline">#FF2D3342</color>
+    <color name="outline_variant">#FF343C4D</color>
+    <color name="overlay_scrim">#E61A1F2A</color>
 
     <!-- Text Colors (Dark Mode) -->
-    <color name="text_primary">#FFFFFFFF</color>
-    <color name="text_secondary">#FFB0B0B0</color>
-    <color name="text_tertiary">#FF808080</color>
-    <color name="text_on_primary">#FF1F1F1F</color>
+    <color name="text_primary">#FFF3F6FF</color>
+    <color name="text_secondary">#FFADB6CA</color>
+    <color name="text_tertiary">#FF808AA3</color>
+    <color name="text_on_primary">#FF151129</color>
 </resources>
 

@@ -5,20 +5,20 @@
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    app:cardElevation="1dp"
     app:strokeColor="@color/outline"
     app:strokeWidth="1dp"
-    app:cardBackgroundColor="?attr/colorSurface">
+    app:cardBackgroundColor="@color/surface_variant">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="14dp">
 
         <!-- Status Indicator Icon/Progress -->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="12dp"
@@ -27,6 +27,11 @@
             android:outlineProvider="background"
             app:elevation="0dp">
 
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/status_dot" />
+
             <ProgressBar
                 android:id="@+id/progressConnection"
                 style="?android:attr/progressBarStyleSmall"
@@ -34,7 +39,7 @@
                 android:layout_height="20dp"
                 android:visibility="gone"
                 android:tint="@color/md_primary" />
-        </LinearLayout>
+        </FrameLayout>
 
         <!-- Text Content -->
         <LinearLayout
@@ -49,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/status_title"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                android:textColor="@color/md_primary"
+                android:textColor="@color/text_secondary"
                 android:textStyle="bold"
                 android:letterSpacing="0.05" />
 
@@ -61,13 +66,14 @@
                 android:text="@string/status_idle"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tvStatusHint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                 android:textColor="@color/text_secondary"
                 android:visibility="gone" />

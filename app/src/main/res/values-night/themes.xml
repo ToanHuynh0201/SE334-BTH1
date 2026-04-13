@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Dark Mode Theme - Modern Material Design -->
     <style name="Theme.BTTH1" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Primary brand color (lighter for dark mode) -->
@@ -9,7 +9,7 @@
         <!-- Secondary brand color -->
         <item name="colorSecondary">@color/md_secondary</item>
         <item name="colorSecondaryVariant">@color/md_secondary</item>
-        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="colorOnSecondary">@color/text_on_primary</item>
 
         <!-- Tertiary color -->
         <item name="colorTertiary">@color/md_tertiary</item>
@@ -35,7 +35,7 @@
         <item name="cornerRadius">8dp</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
-        <item name="android:letterSpacing">0.05</item>
+        <item name="android:letterSpacing">0.04</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

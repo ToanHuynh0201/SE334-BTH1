@@ -4,33 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_light"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <!-- Header with App Title -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/md_primary"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@color/md_primary">
+        android:paddingStart="20dp"
+        android:paddingTop="22dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="18dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
-            android:textSize="24sp"
+            android:textSize="25sp"
             android:textStyle="bold"
             android:textColor="@color/text_on_primary"
-            android:letterSpacing="0.02" />
+            android:letterSpacing="0.015" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:alpha="0.9"
+            android:layout_marginTop="6dp"
+            android:alpha="0.92"
             android:text="@string/app_tagline"
             android:textColor="@color/text_on_primary"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- Main Content Area -->
@@ -38,51 +42,56 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
 
             <!-- Connection State Card -->
             <com.example.btth1.ui.ConnectionStateView
                 android:id="@+id/connectionStateView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="10dp" />
 
             <!-- Discover Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDiscover"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="14dp"
                 android:text="@string/discover_peers"
                 android:textSize="14sp"
                 android:letterSpacing="0.05"
                 app:cornerRadius="8dp"
-                app:elevation="4dp"
+                app:elevation="2dp"
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
 
             <!-- Nearby Devices Section Header -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
                 android:text="@string/nearby_devices"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_primary"
+                android:textAllCaps="true"
                 android:letterSpacing="0.1" />
 
             <!-- Peers List Container -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="?attr/colorSurface"
+                android:layout_height="220dp"
+                android:background="@color/surface_variant"
                 android:outlineProvider="background"
                 app:elevation="1dp">
 
@@ -91,6 +100,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
+                    android:paddingStart="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
                     android:paddingBottom="8dp" />
 
                 <com.example.btth1.ui.PeerListStateView
@@ -106,9 +118,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="?attr/colorSurface">
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
         <!-- Push to Talk Button (Primary CTA) -->
         <com.google.android.material.button.MaterialButton
@@ -121,7 +136,7 @@
             android:enabled="false"
             android:letterSpacing="0.05"
             app:cornerRadius="12dp"
-            app:elevation="4dp"
+            app:elevation="3dp"
             app:backgroundTint="@color/md_primary" />
 
         <!-- Hint Text -->
@@ -129,9 +144,9 @@
             android:id="@+id/tvTalkHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:text="@string/talk_hint_disconnected"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:textColor="@color/text_secondary"
             android:gravity="center"
             android:letterSpacing="0.02" />

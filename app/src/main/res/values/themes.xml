@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme - Modern Material Design -->
     <style name="Theme.BTTH1" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Primary brand color -->
@@ -17,12 +17,13 @@
 
         <!-- Background and surface -->
         <item name="android:colorBackground">@color/surface_light</item>
-        <item name="colorSurface">@color/white</item>
+        <item name="colorSurface">@color/surface_variant</item>
         <item name="colorOnSurface">@color/text_primary</item>
 
         <!-- Status bar -->
         <item name="android:statusBarColor">@color/md_primary</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/surface_light</item>
 
         <!-- Material Components -->
         <item name="materialButtonStyle">@style/Widget.BTTH1.Button</item>
@@ -34,7 +35,7 @@
         <item name="cornerRadius">8dp</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
-        <item name="android:letterSpacing">0.05</item>
+        <item name="android:letterSpacing">0.04</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>
