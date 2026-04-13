@@ -1,37 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/surface_light"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvStatus"
+    <!-- Header with App Title -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/status_idle"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@color/md_primary">
 
-    <Button
-        android:id="@+id/btnDiscover"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/discover_peers" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_on_primary"
+            android:letterSpacing="0.02" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPeers"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="0.9"
+            android:text="@string/app_tagline"
+            android:textColor="@color/text_on_primary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btnTalk"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Connection State Card -->
+            <com.example.btth1.ui.ConnectionStateView
+                android:id="@+id/connectionStateView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Discover Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDiscover"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/discover_peers"
+                android:textSize="14sp"
+                android:letterSpacing="0.05"
+                app:cornerRadius="8dp"
+                app:elevation="4dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+
+            <!-- Nearby Devices Section Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/nearby_devices"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_primary"
+                android:letterSpacing="0.1" />
+
+            <!-- Peers List Container -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="?attr/colorSurface"
+                android:outlineProvider="background"
+                app:elevation="1dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPeers"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp" />
+
+                <com.example.btth1.ui.PeerListStateView
+                    android:id="@+id/peerListStateView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Action Area -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/push_to_talk" />
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="?attr/colorSurface">
+
+        <!-- Push to Talk Button (Primary CTA) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTalk"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/push_to_talk"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:enabled="false"
+            android:letterSpacing="0.05"
+            app:cornerRadius="12dp"
+            app:elevation="4dp"
+            app:backgroundTint="@color/md_primary" />
+
+        <!-- Hint Text -->
+        <TextView
+            android:id="@+id/tvTalkHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/talk_hint_disconnected"
+            android:textSize="11sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:letterSpacing="0.02" />
+
+    </LinearLayout>
 
 </LinearLayout>
-

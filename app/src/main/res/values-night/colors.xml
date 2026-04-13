@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors - Modern Purple -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+
+    <!-- Secondary Colors - Vibrant Teal -->
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <!-- Neutral Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Enhanced Material 3 Colors (Dark Mode) -->
+    <color name="md_primary">#FFB794F6</color>
+    <color name="md_primary_light">#FFE0C3FF</color>
+    <color name="md_primary_dark">#FF7C3AED</color>
+    <color name="md_secondary">#FF80DEEA</color>
+    <color name="md_tertiary">#FFCE93D8</color>
+
+    <!-- Functional Colors -->
+    <color name="success_green">#FF34D399</color>
+    <color name="warning_orange">#FFFCD34D</color>
+    <color name="error_red">#FFFCA5A5</color>
+    <color name="info_blue">#FF60A5FA</color>
+
+    <!-- Surface & Background (Dark Mode) -->
+    <color name="surface_light">#FF121212</color>
+    <color name="surface_variant">#FF1E1E1E</color>
+    <color name="outline">#FF424242</color>
+    <color name="outline_variant">#FF616161</color>
+
+    <!-- Text Colors (Dark Mode) -->
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFB0B0B0</color>
+    <color name="text_tertiary">#FF808080</color>
+    <color name="text_on_primary">#FF1F1F1F</color>
+</resources>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/surface_light">
+
+    <!-- Loading Progress -->
+    <ProgressBar
+        android:id="@+id/progressPeerList"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:visibility="gone"
+        android:tint="@color/md_primary" />
+
+    <!-- State Title -->
+    <TextView
+        android:id="@+id/tvPeerStateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <!-- State Hint -->
+    <TextView
+        android:id="@+id/tvPeerStateHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:letterSpacing="0.02" />
+
+</LinearLayout>
+

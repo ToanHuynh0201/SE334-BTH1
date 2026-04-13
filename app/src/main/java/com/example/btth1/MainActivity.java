@@ -32,6 +32,8 @@ import com.example.btth1.audio.ReceiveAudioThread;
 import com.example.btth1.audio.SendAudioThread;
 import com.example.btth1.network.ClientClass;
 import com.example.btth1.network.ServerClass;
+import com.example.btth1.ui.ConnectionStateView;
+import com.example.btth1.ui.PeerListStateView;
 import com.example.btth1.wifi.WiFiDirectBroadcastReceiver;
 
 import java.io.IOException;
@@ -54,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final long CLIENT_INITIAL_BACKOFF_MS = 1000L;
     private static final int CLIENT_MAX_RETRIES = 3;
 
-    private TextView tvStatus;
+    private ConnectionStateView connectionStateView;
+    private TextView tvTalkHint;
     private Button btnDiscover;
     private Button btnTalk;
 
@@ -72,6 +75,10 @@ public class MainActivity extends AppCompatActivity implements
     private SendAudioThread sendAudioThread;
     private ReceiveAudioThread receiveAudioThread;
     private WifiP2pDevice pendingPeer;
+    private String connectedPeerAddress;
+    private boolean discoveryInProgress;
+    private PeerListStateView peerListStateView;
+    private ConnectionStateView.UiState currentConnectionUiState = ConnectionStateView.UiState.DISCONNECTED;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Runnable connectionTimeoutRunnable;
 
@@ -87,7 +94,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initViews() {
-        tvStatus = findViewById(R.id.tvStatus);
+        connectionStateView = findViewById(R.id.connectionStateView);
+        peerListStateView = findViewById(R.id.peerListStateView);
+        tvTalkHint = findViewById(R.id.tvTalkHint);
         btnDiscover = findViewById(R.id.btnDiscover);
         btnTalk = findViewById(R.id.btnTalk);
 
@@ -95,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements
         peerListAdapter = new PeerListAdapter(peers, this);
         rvPeers.setLayoutManager(new LinearLayoutManager(this));
         rvPeers.setAdapter(peerListAdapter);
+
+        renderPeerListState();
+        renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_idle), null);
+        updateTalkUiState(false, false);
     }
 
     private void initWifiDirect() {
@@ -142,13 +155,17 @@ public class MainActivity extends AppCompatActivity implements
         manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                showStatus(getString(R.string.status_discovering));
+                discoveryInProgress = true;
+                renderPeerListState();
+                renderConnectionState(ConnectionStateView.UiState.DISCOVERING, getString(R.string.status_discovering), null);
             }
 
             @Override
             public void onFailure(int reason) {
-                showStatus(getString(R.string.status_idle));
-                Toast.makeText(MainActivity.this, "Discover failed: " + reason, Toast.LENGTH_SHORT).show();
+                discoveryInProgress = false;
+                renderPeerListState();
+                renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_idle), null);
+                Toast.makeText(MainActivity.this, getString(R.string.toast_discover_failed, reason), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -164,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         pendingPeer = device;
+        peerListAdapter.setConnectingDeviceAddress(device.deviceAddress);
         connectWithRetry(device, 1);
     }
 
@@ -172,7 +190,11 @@ public class MainActivity extends AppCompatActivity implements
         config.deviceAddress = device.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
 
-        showStatus(getString(R.string.status_connecting, getDisplayName(device), attempt, MAX_P2P_CONNECT_RETRIES));
+        renderConnectionState(
+                ConnectionStateView.UiState.CONNECTING,
+                getString(R.string.status_connecting, getDisplayName(device), attempt, MAX_P2P_CONNECT_RETRIES),
+                getString(R.string.status_connecting_socket)
+        );
         connectWithPermissionChecked(config, device, attempt);
     }
 
@@ -181,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                showStatus(getString(R.string.status_connecting_socket));
+                renderConnectionState(ConnectionStateView.UiState.CONNECTING, getString(R.string.status_connecting_socket), null);
                 startConnectionTimeoutWatchdog();
             }
 
@@ -189,13 +211,14 @@ public class MainActivity extends AppCompatActivity implements
             public void onFailure(int reason) {
                 if (attempt < MAX_P2P_CONNECT_RETRIES) {
                     long delayMs = INITIAL_P2P_BACKOFF_MS * (1L << (attempt - 1));
-                    showStatus(getString(R.string.status_retrying, delayMs));
+                    renderConnectionState(ConnectionStateView.UiState.CONNECTING, getString(R.string.status_retrying, delayMs), null);
                     mainHandler.postDelayed(() -> connectWithRetry(device, attempt + 1), delayMs);
                     return;
                 }
 
-                showStatus(getString(R.string.status_connect_failed));
-                Toast.makeText(MainActivity.this, "Connect failed: " + reason, Toast.LENGTH_SHORT).show();
+                peerListAdapter.setConnectingDeviceAddress(null);
+                renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_connect_failed), null);
+                Toast.makeText(MainActivity.this, getString(R.string.toast_connect_failed, reason), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -207,7 +230,8 @@ public class MainActivity extends AppCompatActivity implements
                 String status = pendingPeer == null
                         ? getString(R.string.status_timeout)
                         : getString(R.string.status_timeout_device, getDisplayName(pendingPeer));
-                showStatus(status);
+                peerListAdapter.setConnectingDeviceAddress(null);
+                renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, status, null);
             }
         };
         mainHandler.postDelayed(connectionTimeoutRunnable, CONNECTION_INFO_TIMEOUT_MS);
@@ -232,7 +256,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void startTalking() {
         if (socket == null || !socket.isConnected()) {
-            Toast.makeText(this, "Socket is not connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_socket_not_connected, Toast.LENGTH_SHORT).show();
+            updateTalkUiState(false, false);
             return;
         }
         if (sendAudioThread != null && sendAudioThread.isAlive()) {
@@ -243,9 +268,11 @@ public class MainActivity extends AppCompatActivity implements
             sendAudioThread = new SendAudioThread(socket.getOutputStream());
             sendAudioThread.startRecording();
             sendAudioThread.start();
-            showStatus(getString(R.string.status_talking));
+            renderConnectionState(ConnectionStateView.UiState.TALKING, getString(R.string.status_talking), null);
+            updateTalkUiState(true, true);
         } catch (IOException e) {
-            Toast.makeText(this, "Cannot start microphone", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_cannot_start_microphone, Toast.LENGTH_SHORT).show();
+            updateTalkUiState(true, false);
         }
     }
 
@@ -255,7 +282,27 @@ public class MainActivity extends AppCompatActivity implements
             sendAudioThread = null;
         }
         if (socket != null && socket.isConnected()) {
-            showStatus(getString(R.string.status_connected));
+            renderConnectionState(ConnectionStateView.UiState.CONNECTED, getString(R.string.status_connected), null);
+            updateTalkUiState(true, false);
+        } else {
+            updateTalkUiState(false, false);
+        }
+    }
+
+    private void updateTalkUiState(boolean connected, boolean talking) {
+        if (btnTalk != null) {
+            btnTalk.setEnabled(connected);
+            btnTalk.setAlpha(connected ? 1.0f : 0.5f);
+        }
+
+        if (tvTalkHint != null) {
+            if (talking) {
+                tvTalkHint.setText(R.string.talk_hint_talking);
+            } else if (connected) {
+                tvTalkHint.setText(R.string.talk_hint_connected);
+            } else {
+                tvTalkHint.setText(R.string.talk_hint_disconnected);
+            }
         }
     }
 
@@ -296,21 +343,54 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showStatus(String status) {
-        runOnUiThread(() -> tvStatus.setText(status));
+        runOnUiThread(() -> renderConnectionState(currentConnectionUiState, status, null));
+    }
+
+    private void renderConnectionState(ConnectionStateView.UiState uiState, String statusText, String hintText) {
+        currentConnectionUiState = uiState;
+        if (connectionStateView != null) {
+            connectionStateView.render(uiState, statusText, hintText);
+        }
+    }
+
+    private void renderPeerListState() {
+        if (peerListStateView == null) {
+            return;
+        }
+
+        if (discoveryInProgress && peers.isEmpty()) {
+            peerListStateView.render(PeerListStateView.Mode.LOADING);
+            return;
+        }
+
+        if (!discoveryInProgress && peers.isEmpty()) {
+            peerListStateView.render(PeerListStateView.Mode.EMPTY);
+            return;
+        }
+
+        peerListStateView.render(PeerListStateView.Mode.HIDDEN);
     }
 
     private void onSocketConnected(Socket connectedSocket) {
         clearConnectionTimeoutWatchdog();
         closeSocketOnly();
         socket = connectedSocket;
+        connectedPeerAddress = pendingPeer != null ? pendingPeer.deviceAddress : connectedPeerAddress;
+        peerListAdapter.setConnectingDeviceAddress(null);
+        peerListAdapter.setConnectedDeviceAddress(connectedPeerAddress);
         pendingPeer = null;
 
         try {
             receiveAudioThread = new ReceiveAudioThread(socket.getInputStream());
             receiveAudioThread.start();
-            showStatus(getString(R.string.status_connected));
+            String status = connectedPeerAddress == null
+                    ? getString(R.string.status_connected)
+                    : getString(R.string.status_connected_to, connectedPeerAddress);
+            renderConnectionState(ConnectionStateView.UiState.CONNECTED, status, null);
+            updateTalkUiState(true, false);
         } catch (IOException e) {
-            Toast.makeText(this, "Cannot start receiver", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_cannot_start_receiver, Toast.LENGTH_SHORT).show();
+            updateTalkUiState(false, false);
         }
     }
 
@@ -332,6 +412,9 @@ public class MainActivity extends AppCompatActivity implements
             }
             socket = null;
         }
+
+        peerListAdapter.setConnectedDeviceAddress(null);
+        updateTalkUiState(false, false);
     }
 
     private void cleanupAllConnections() {
@@ -380,10 +463,17 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList) {
+        discoveryInProgress = false;
         peers.clear();
         peers.addAll(peerList.getDeviceList());
         peerListAdapter.notifyDataSetChanged();
-        showStatus(getString(R.string.status_found_peers, peers.size()));
+        renderPeerListState();
+
+        if (peers.isEmpty()) {
+            renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_idle), null);
+        } else {
+            showStatus(getString(R.string.status_found_peers, peers.size()));
+        }
     }
 
     @Override
@@ -395,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (info.isGroupOwner) {
-            showStatus(getString(R.string.status_waiting_client));
+            renderConnectionState(ConnectionStateView.UiState.CONNECTING, getString(R.string.status_waiting_client), null);
             if (serverClass != null) {
                 serverClass.closeServer();
             }
@@ -407,20 +497,20 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public void onTimeout(int timeoutMs) {
-                    runOnUiThread(() -> showStatus(getString(R.string.status_server_timeout)));
+                    runOnUiThread(() -> renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_server_timeout), null));
                 }
 
                 @Override
                 public void onError(IOException e) {
                     runOnUiThread(() -> {
-                        showStatus(getString(R.string.status_connect_failed));
-                        Toast.makeText(MainActivity.this, "Server error", Toast.LENGTH_SHORT).show();
+                        renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_connect_failed), null);
+                        Toast.makeText(MainActivity.this, R.string.toast_server_error, Toast.LENGTH_SHORT).show();
                     });
                 }
             }, SERVER_ACCEPT_TIMEOUT_MS);
             serverClass.start();
         } else {
-            showStatus(getString(R.string.status_connecting_socket));
+            renderConnectionState(ConnectionStateView.UiState.CONNECTING, getString(R.string.status_connecting_socket), null);
             ClientClass client = new ClientClass(info.groupOwnerAddress, new ClientClass.Callback() {
                 @Override
                 public void onConnected(Socket socket) {
@@ -429,14 +519,18 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public void onRetry(int attempt, int maxRetries, long backoffMs) {
-                    runOnUiThread(() -> showStatus(getString(R.string.status_client_retry, attempt, maxRetries, backoffMs)));
+                    runOnUiThread(() -> renderConnectionState(
+                            ConnectionStateView.UiState.CONNECTING,
+                            getString(R.string.status_client_retry, attempt, maxRetries, backoffMs),
+                            null
+                    ));
                 }
 
                 @Override
                 public void onError(IOException e) {
                     runOnUiThread(() -> {
-                        showStatus(getString(R.string.status_client_connect_failed));
-                        Toast.makeText(MainActivity.this, "Client error", Toast.LENGTH_SHORT).show();
+                        renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_client_connect_failed), null);
+                        Toast.makeText(MainActivity.this, R.string.toast_client_error, Toast.LENGTH_SHORT).show();
                     });
                 }
             }, CLIENT_MAX_RETRIES, CLIENT_CONNECT_TIMEOUT_MS, CLIENT_INITIAL_BACKOFF_MS);
@@ -446,7 +540,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onWifiP2pStateChanged(boolean enabled) {
-        showStatus(enabled ? getString(R.string.status_idle) : "Wi-Fi Direct is disabled");
+        if (enabled) {
+            renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_idle), null);
+        } else {
+            renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_wifi_direct_disabled), null);
+        }
     }
 
     @Override
@@ -471,7 +569,10 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             clearConnectionTimeoutWatchdog();
             pendingPeer = null;
-            showStatus(getString(R.string.status_idle));
+            connectedPeerAddress = null;
+            peerListAdapter.setConnectingDeviceAddress(null);
+            peerListAdapter.setConnectedDeviceAddress(null);
+            renderConnectionState(ConnectionStateView.UiState.DISCONNECTED, getString(R.string.status_idle), null);
             closeSocketOnly();
         }
     }
@@ -485,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements
         String deviceName = device.deviceName == null || device.deviceName.trim().isEmpty()
                 ? device.deviceAddress
                 : device.deviceName;
-        showStatus("This device: " + deviceName);
+        showStatus(getString(R.string.status_this_device, deviceName));
     }
 
     @Override
@@ -503,9 +604,3 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 }
-
-
-
-
-
-

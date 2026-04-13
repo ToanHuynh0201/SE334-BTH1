@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Walkie Talkie Offline</string>
+    <string name="status_title">Connection Status</string>
     <string name="status_idle">Disconnected</string>
     <string name="status_discovering">Discovering peers...</string>
     <string name="status_connecting">Connecting to %1$s (attempt %2$d/%3$d)</string>
@@ -15,10 +16,38 @@
     <string name="status_connected">Connected</string>
     <string name="status_talking">Talking...</string>
     <string name="discover_peers">Discover Devices</string>
+    <string name="nearby_devices">Nearby Devices</string>
     <string name="push_to_talk">Hold To Talk</string>
+    <string name="talk_hint_disconnected">Connect to a peer before talking.</string>
+    <string name="talk_hint_connected">Press and hold the button to transmit audio.</string>
+    <string name="talk_hint_talking">Release the button to stop transmitting.</string>
     <string name="permission_required">Required permissions are missing.</string>
     <string name="peer_name_unknown">Unknown device</string>
     <string name="peer_address">Address: %1$s</string>
     <string name="status_connected_to">Connected to %1$s</string>
     <string name="status_found_peers">Found peers: %1$d</string>
+    <string name="status_connecting_label">Connecting</string>
+    <string name="status_discovering_label">Discovering</string>
+    <string name="status_connected_label">Connected</string>
+    <string name="status_disconnected_label">Disconnected</string>
+    <string name="status_talking_label">Transmitting</string>
+    <string name="peer_list_loading">Scanning for nearby devices...</string>
+    <string name="peer_list_empty">No nearby devices found</string>
+    <string name="peer_list_empty_hint">Tap Discover Devices to scan again.</string>
+    <string name="peer_state_available">Available</string>
+    <string name="peer_state_invited">Invited</string>
+    <string name="peer_state_connected">Connected</string>
+    <string name="peer_state_failed">Failed</string>
+    <string name="peer_state_unavailable">Unavailable</string>
+    <string name="peer_state_connecting">Connecting...</string>
+    <string name="app_tagline">Connect and communicate offline</string>
+    <string name="status_wifi_direct_disabled">Wi-Fi Direct is disabled</string>
+    <string name="status_this_device">This device: %1$s</string>
+    <string name="toast_discover_failed">Discover failed: %1$d</string>
+    <string name="toast_connect_failed">Connect failed: %1$d</string>
+    <string name="toast_socket_not_connected">Socket is not connected</string>
+    <string name="toast_cannot_start_microphone">Cannot start microphone</string>
+    <string name="toast_cannot_start_receiver">Cannot start receiver</string>
+    <string name="toast_server_error">Server error</string>
+    <string name="toast_client_error">Client error</string>
 </resources>
